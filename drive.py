@@ -11,7 +11,7 @@ from apiclient import errors
 from oauth2client.file import Storage
 import os.path
 import magic
-from datetime import datetime, timezone
+from datetime import datetime
 
 def insert_file(service, title, description, parent_id, mime_type, filename):
   
@@ -185,7 +185,8 @@ elif sys.argv[1]=="push":
   f=open('.drive/credentials.txt','r')
   credential=f.read().splitlines()
   f.close()
-  date=datetime.now(timezone.utc).strftime("%Y%m%d")
+  date=datetime.utcnow().strftime("%Y%m%d")
+
   mimetype=magic.from_file(sys.argv[2], mime=True)
   update_file(drive_service, credential[2], sys.argv[2], "file updated on "+date, mimetype,
                 sys.argv[2], "new_revision")

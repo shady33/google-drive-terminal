@@ -10,6 +10,8 @@ from oauth2client.client import OAuth2WebServerFlow
 from apiclient import errors
 from oauth2client.file import Storage
 import os.path
+import magic
+from datetime import datetime, timezone
 
 def insert_file(service, title, description, parent_id, mime_type, filename):
   
@@ -183,7 +185,16 @@ elif sys.argv[1]=="push":
   f=open('.drive/credentials.txt','r')
   credential=f.read().splitlines()
   f.close()
-  update_file(drive_service, credential[2], "new_title", "new_description", "text/xml",
-                "filename", "new_revision")
-  #insert_file(drive_service, "title", "description", "0B2UfUTlp455beWRHb3doMWZCeGc", "text/xml", "filename")
+  date=datetime.now(timezone.utc).strftime("%Y%m%d")
+  mimetype=magic.from_file(sys.argv[2], mime=True)
+  update_file(drive_service, credential[2], sys.argv[2], "file updated on "+date, mimetype,
+                sys.argv[2], "new_revision")
+
+elif sys.argv[1]=="upload":
+  drive_service=connect()
+  f=open('.drive/credentials.txt','r')
+  credential=f.read().splitlines()
+  f.close()
+  mimetype=magic.from_file(sys.argv[2], mime=True)
+  insert_file(drive_service,sys.argv[2], "Uploaded from drive terminal", credential[2], mimetype, sys.argv[2])
 

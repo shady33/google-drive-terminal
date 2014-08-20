@@ -113,6 +113,7 @@ def connect():
   drive_service = build('drive', 'v2', http=http)
   return drive_service
 
+# __init__
 if len(sys.argv) > 1:
     print "Argument Given:"+sys.argv[1]
 else:
@@ -151,7 +152,7 @@ elif sys.argv[1]=="add":
   else:
     print "Add a filename"  
 
-
+#root in place of credentials[2]
 elif sys.argv[1]== "pull":
   drive_service=connect()
   f=open('.drive/credentials.txt','r')
@@ -159,11 +160,17 @@ elif sys.argv[1]== "pull":
   f.close()
   try:
     param = {}
-    param['q'] = "'"+credential[2] + "' in parents"
+    if credential[2]=="":
+    	location="root"
+    else:
+    	location=credential[2]
+    	
+    param['q'] = "'"+ location + "' in parents"
     files = drive_service.files().list(**param).execute()
     if len(sys.argv) > 2:
       if sys.argv[2]=="all":
         for filex in files['items']:
+          print filex['title']
           download_file(drive_service,filex,filex['title'])
     else:
       for filex in files['items']:
@@ -198,4 +205,3 @@ elif sys.argv[1]=="upload":
   f.close()
   mimetype=magic.from_file(sys.argv[2], mime=True)
   insert_file(drive_service,sys.argv[2], "Uploaded from drive terminal", credential[2], mimetype, sys.argv[2])
-
